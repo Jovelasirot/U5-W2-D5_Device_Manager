@@ -2,6 +2,7 @@ package jovelAsirot.U5W2D5.services;
 
 import jovelAsirot.U5W2D5.entities.Device;
 import jovelAsirot.U5W2D5.entities.Employee;
+import jovelAsirot.U5W2D5.exceptions.BadRequestException;
 import jovelAsirot.U5W2D5.exceptions.InvalidStatusException;
 import jovelAsirot.U5W2D5.exceptions.InvalidTypeException;
 import jovelAsirot.U5W2D5.exceptions.NotFoundException;
@@ -67,12 +68,23 @@ public class DeviceService {
             deviceFound.setType(typeChecker(updatedDevice.type()));
         }
 
-        if (updatedDevice.employeeId() == null) {
-            deviceFound.setEmployee(null);
-        } else {
+        if (updatedDevice.employeeId() != null) {
             Employee employee = employeeService.findById(updatedDevice.employeeId());
+
+            if (deviceFound.getEmployee() != null && updatedDevice.employeeId().equals(deviceFound.getEmployee().getId())) {
+                throw new BadRequestException("The employee with id: " + employee.getId() + " already has the device " + deviceId + " - " + deviceFound.getType());
+            }
+
+            if (deviceFound.getStatus().equals("assigned")) {
+                throw new BadRequestException("The device with id: " + deviceId + " is already assigned to another employee");
+            }
+
             deviceFound.setEmployee(employee);
             deviceFound.setStatus("assigned");
+        } else {
+           
+            deviceFound.setEmployee(null);
+            deviceFound.setStatus("available");
         }
 
         if (updatedDevice.status() != null) {
