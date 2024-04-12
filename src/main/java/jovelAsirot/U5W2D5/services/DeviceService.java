@@ -3,6 +3,7 @@ package jovelAsirot.U5W2D5.services;
 import jovelAsirot.U5W2D5.entities.Device;
 import jovelAsirot.U5W2D5.entities.Employee;
 import jovelAsirot.U5W2D5.exceptions.InvalidStatusException;
+import jovelAsirot.U5W2D5.exceptions.InvalidTypeException;
 import jovelAsirot.U5W2D5.exceptions.NotFoundException;
 import jovelAsirot.U5W2D5.payloads.DeviceDTO;
 import jovelAsirot.U5W2D5.repositories.DeviceDAO;
@@ -35,15 +36,14 @@ public class DeviceService {
 
         switch (payload.status()) {
             case "available", "maintenance", "dismissed" -> {
-                Employee employee = null;
-                newDevice = new Device(payload.type(), payload.status(), null);
+                newDevice = new Device(typeChecker(payload.type()), payload.status(), null);
             }
             case "assigned" -> {
                 Employee employee = employeeService.findById(payload.employeeId());
                 if (employee == null) {
                     throw new NotFoundException(payload.employeeId());
                 } else {
-                    newDevice = new Device(payload.type(), payload.status(), employee);
+                    newDevice = new Device(typeChecker(payload.type()), payload.status(), employee);
                 }
             }
             default -> throw new InvalidStatusException(payload.status());
@@ -64,9 +64,9 @@ public class DeviceService {
         if (updatedDevice.type() == null) {
             deviceFound.setType(deviceFound.getType());
         } else {
-            deviceFound.setType(updatedDevice.type());
+            deviceFound.setType(typeChecker(updatedDevice.type()));
         }
-        
+
         if (updatedDevice.employeeId() == null) {
             deviceFound.setEmployee(null);
         } else {
@@ -88,6 +88,15 @@ public class DeviceService {
         }
 
         return this.dDAO.save(deviceFound);
+    }
+
+    public String typeChecker(String type) {
+        switch (type) {
+            case "desktop", "laptop", "mobile" -> {
+                return type;
+            }
+            default -> throw new InvalidTypeException(type);
+        }
     }
 
     public void deleteById(Long deviceId) {

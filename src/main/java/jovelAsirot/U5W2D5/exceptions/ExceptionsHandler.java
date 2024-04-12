@@ -40,6 +40,13 @@ public class ExceptionsHandler {
         return new ErrorResponseDTO(ex.getMessage(), LocalDateTime.now());
     }
 
+    @ExceptionHandler(InvalidTypeException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST) // 400
+    public ErrorResponseDTO handleInvalidType(InvalidTypeException ex) {
+        ex.printStackTrace();
+        return new ErrorResponseDTO(ex.getMessage(), LocalDateTime.now());
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST) // 400
     public ErrorResponseDTO handleIllegalArgumentException(IllegalArgumentException ex) {
