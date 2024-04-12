@@ -33,20 +33,20 @@ public class DeviceService {
 
         Device newDevice;
 
-        if (payload.status().equals("available")) {
-            Employee employee = null;
-            newDevice = new Device(payload.type(), payload.status(), null);
-
-        } else if (payload.status().equals("assigned")) {
-            Employee employee = employeeService.findById(payload.employeeId());
-            if (employee == null) {
-                throw new NotFoundException(payload.employeeId());
-            } else {
-                newDevice = new Device(payload.type(), payload.status(), employee);
+        switch (payload.status()) {
+            case "available", "maintenance", "dismissed" -> {
+                Employee employee = null;
+                newDevice = new Device(payload.type(), payload.status(), null);
             }
-
-        } else {
-            throw new InvalidStatusException(payload.status());
+            case "assigned" -> {
+                Employee employee = employeeService.findById(payload.employeeId());
+                if (employee == null) {
+                    throw new NotFoundException(payload.employeeId());
+                } else {
+                    newDevice = new Device(payload.type(), payload.status(), employee);
+                }
+            }
+            default -> throw new InvalidStatusException(payload.status());
         }
 
 
@@ -69,11 +69,22 @@ public class DeviceService {
         
         if (updatedDevice.employeeId() == null) {
             deviceFound.setEmployee(null);
-            deviceFound.setStatus("available");
         } else {
             Employee employee = employeeService.findById(updatedDevice.employeeId());
             deviceFound.setEmployee(employee);
             deviceFound.setStatus("assigned");
+        }
+
+        if (updatedDevice.status() != null) {
+            switch (updatedDevice.status()) {
+                case "available", "maintenance", "dismissed" -> {
+                    deviceFound.setStatus(updatedDevice.status());
+                    deviceFound.setEmployee(null);
+                }
+                default -> throw new InvalidStatusException(updatedDevice.status());
+            }
+        } else {
+            deviceFound.setStatus(deviceFound.getStatus());
         }
 
         return this.dDAO.save(deviceFound);
