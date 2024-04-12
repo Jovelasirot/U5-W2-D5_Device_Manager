@@ -24,9 +24,9 @@ public class Device {
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
-    public Device(String type, String status) {
+    public Device(String type, String status, Employee employee) {
         this.type = type;
         this.status = status;
+        this.employee = employee;
     }
-
 }

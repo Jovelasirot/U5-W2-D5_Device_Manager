@@ -34,7 +34,7 @@ public class DeviceController {
     }
 
     @PutMapping("{deviceId}")
-    public Device updateDevice(@PathVariable Long deviceId, @RequestBody Device deviceBody) {
+    public Device updateDevice(@PathVariable Long deviceId, @RequestBody DeviceDTO deviceBody) {
         return this.deviceService.updateById(deviceId, deviceBody);
     }
 

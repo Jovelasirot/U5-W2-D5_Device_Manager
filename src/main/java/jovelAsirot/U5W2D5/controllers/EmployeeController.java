@@ -53,7 +53,7 @@ public class EmployeeController {
         return this.employeeService.updateById(employeeId, employeeBody);
     }
 
-    @DeleteMapping("{authorId}")
+    @DeleteMapping("{employeeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteEmployee(@PathVariable Long employeeId) {
         this.employeeService.deleteById(employeeId);

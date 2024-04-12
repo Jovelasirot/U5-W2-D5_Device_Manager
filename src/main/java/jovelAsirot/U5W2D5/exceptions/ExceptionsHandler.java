@@ -21,16 +21,30 @@ public class ExceptionsHandler {
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST) // 400
-    public ErrorResponseDTO handleBadRequest(BadRequestException ex){
-        if(ex.getErrorsList() != null) {
+    public ErrorResponseDTO handleBadRequest(BadRequestException ex) {
+        if (ex.getErrorsList() != null) {
             String message = ex.getErrorsList().stream()
                     .map(objectError -> objectError.getDefaultMessage())
-                    .collect(Collectors.joining(" | " ));
+                    .collect(Collectors.joining(" | "));
             return new ErrorResponseDTO(message, LocalDateTime.now());
 
         } else {
             return new ErrorResponseDTO(ex.getMessage(), LocalDateTime.now());
         }
+    }
+
+    @ExceptionHandler(InvalidStatusException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST) // 400
+    public ErrorResponseDTO handleInvalidStatus(InvalidStatusException ex) {
+        ex.printStackTrace();
+        return new ErrorResponseDTO(ex.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST) // 400
+    public ErrorResponseDTO handleIllegalArgumentException(IllegalArgumentException ex) {
+        ex.printStackTrace();
+        return new ErrorResponseDTO("Missing a value", LocalDateTime.now());
     }
 
     @ExceptionHandler(Exception.class)
