@@ -61,8 +61,12 @@ public class DeviceService {
     public Device updateById(Long deviceId, DeviceDTO updatedDevice) {
         Device deviceFound = this.findById(deviceId);
 
-        deviceFound.setType(updatedDevice.type());
-
+        if (updatedDevice.type() == null) {
+            deviceFound.setType(deviceFound.getType());
+        } else {
+            deviceFound.setType(updatedDevice.type());
+        }
+        
         if (updatedDevice.employeeId() == null) {
             deviceFound.setEmployee(null);
             deviceFound.setStatus("available");
