@@ -44,7 +44,7 @@ public class EmployeeController {
     }
 
     @GetMapping("{employeeId}")
-    public Employee getEmployee(@RequestParam Long employeeId) {
+    public Employee getEmployee(@PathVariable Long employeeId) {
         return this.employeeService.findById(employeeId);
     }
 

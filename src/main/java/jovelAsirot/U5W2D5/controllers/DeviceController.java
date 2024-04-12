@@ -29,7 +29,7 @@ public class DeviceController {
     }
 
     @GetMapping("{deviceId}")
-    public Device getDevice(@RequestParam Long deviceId) {
+    public Device getDevice(@PathVariable Long deviceId) {
         return this.deviceService.findById(deviceId);
     }
 

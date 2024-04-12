@@ -3,6 +3,7 @@ package jovelAsirot.U5W2D5.services;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import jovelAsirot.U5W2D5.entities.Employee;
+import jovelAsirot.U5W2D5.exceptions.BadRequestException;
 import jovelAsirot.U5W2D5.exceptions.NotFoundException;
 import jovelAsirot.U5W2D5.payloads.EmployeeDTO;
 import jovelAsirot.U5W2D5.repositories.EmployeeDAO;
@@ -32,6 +33,11 @@ public class EmployeeService {
     }
 
     public Employee save(EmployeeDTO payload) {
+        this.eDAO.findByEmail(payload.email()).ifPresent(
+                employee -> {
+                    throw new BadRequestException("Email " + employee.getEmail() + " is already being used (ᗒᗣᗕ)՞ ");
+                }
+        );
         Employee newEmployee = new Employee(payload.username(), payload.name(), payload.surname(), payload.email(), "https://ui-avatars.com/api/?name=" + payload.name() + "+" + payload.surname());
 
         return eDAO.save(newEmployee);
@@ -54,13 +60,19 @@ public class EmployeeService {
     public Employee updateById(Long employeeId, Employee updatedEmployee) {
         Employee employeeFound = this.findById(employeeId);
 
-        String employeeEmail = updatedEmployee.getName() + employeeFound.getSurname() + "@gmail.com";
+        String employeeEmail = updatedEmployee.getName() + updatedEmployee.getSurname() + "@gmail.com";
         String employeeProfileImg = "https://ui-avatars.com/api/?name=" + updatedEmployee.getName() + "+" + updatedEmployee.getSurname();
+
+        this.eDAO.findByEmailAndId(updatedEmployee.getEmail(), employeeId).ifPresent(
+                employee -> {
+                    throw new BadRequestException("Email " + employee.getEmail() + " is already being used by another employee (ᗒᗣᗕ)՞ ");
+                }
+        );
 
         employeeFound.setUsername(updatedEmployee.getUsername());
         employeeFound.setName(updatedEmployee.getName());
         employeeFound.setSurname(updatedEmployee.getSurname());
-        employeeFound.setEmail(employeeFound.getEmail() == null ? employeeEmail : employeeFound.getEmail());
+        employeeFound.setEmail(updatedEmployee.getEmail() == null ? employeeEmail : updatedEmployee.getEmail());
         employeeFound.setProfileImage(employeeProfileImg);
 
         return this.eDAO.save(employeeFound);
