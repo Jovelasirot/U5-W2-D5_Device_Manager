@@ -28,4 +28,5 @@ public class Device {
         this.type = type;
         this.status = status;
     }
+
 }

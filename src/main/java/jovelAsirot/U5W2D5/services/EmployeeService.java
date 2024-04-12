@@ -15,8 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.util.Random;
 
 @Service
 public class EmployeeService {
@@ -27,14 +25,14 @@ public class EmployeeService {
     @Autowired
     private Cloudinary cloudinaryUploader;
 
-    public Page<Employee> getAll(int page, int size, String sortBy){
-        Pageable pageable = PageRequest.of(page,size, Sort.by(sortBy));
+    public Page<Employee> getAll(int page, int size, String sortBy) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
 
         return this.eDAO.findAll(pageable);
     }
 
-    public Employee save(EmployeeDTO payload){
-        Employee newEmployee = new Employee(payload.username(), payload.name(), payload.surname(), payload.email(), "https://ui-avatars.com/api/?name="+ payload.name() + "+" + payload.surname());
+    public Employee save(EmployeeDTO payload) {
+        Employee newEmployee = new Employee(payload.username(), payload.name(), payload.surname(), payload.email(), "https://ui-avatars.com/api/?name=" + payload.name() + "+" + payload.surname());
 
         return eDAO.save(newEmployee);
     }
@@ -73,4 +71,5 @@ public class EmployeeService {
 
         this.eDAO.delete(employeeFound);
     }
+
 }
